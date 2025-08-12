@@ -53,8 +53,8 @@ for b in range(BATCHES):
 from bigramLM import BigramLanguageModel
 
 m = BigramLanguageModel(vocab_size)
-out = m(x)
-print(out.shape)
+logits, loss = m(x, y)
+print(logits.shape, loss)
 
 
 
