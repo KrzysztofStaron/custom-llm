@@ -1,3 +1,5 @@
+# TODO: You can try bulding sub-word tokenizer
+
 class Tokenizer:
   def __init__(self, vocab):
     self.vocab = vocab
@@ -6,14 +8,14 @@ class Tokenizer:
   def encode(self, str):
     output = []
     for char in str:
-      output.append(self.chars.index(char))
+      output.append(self.vocab.index(char))
 
     return output
 
   def decode(self, int_arr):
     output = ""
     for i in int_arr:
-      output += self.chars[i]
+      output += self.vocab[i]
     
     return output
 
