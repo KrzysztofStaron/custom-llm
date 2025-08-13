@@ -6,15 +6,16 @@ import torch.nn as nn
 text = open("input.txt", "r").read()
 
 SPLIT_PERCENT = 0.9
-CONTEXT_LENGTH = 8
-BATCHE_SIZE = 4
-DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-print(DEVICE)
-EVAL_ITERS = 500
+CONTEXT_LENGTH = 32
+BATCHE_SIZE = 16
+DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
+EVAL_ITERS = 200
 MAX_ITER = 5000
 LEARNING_RATE = 1e-3
-N_EMBD = 32
-
+N_EMBD = 64
+N_HEAD = 4
+N_LAYER = 4
+DROPOUT = 0.0
 
 class Head(nn.Module):
   def __init__(self, head_size: int):
@@ -66,10 +67,12 @@ class Block(nn.Module):
     head_size = n_embd // n_head
     self.sa = MultiHeadAttention(n_head, head_size)
     self.ffwd = FeedForward(n_embd)
+    self.ln1 = LayerNorm1d(n_embd)
+    self.ln2 = LayerNorm1d(n_embd)
 
   def forward(self, x):
-    x = x + self.sa(x)
-    x = x + self.ffwd(x)
+    x = x + self.sa(self.ln1(x))
+    x = x + self.ffwd(self.ln2(x))
     return x
     
 
@@ -81,6 +84,7 @@ class BigramLanguageModel(nn.Module):
 
     
     self.blocks = nn.Sequential(*[Block(N_EMBD, n_head=4) for _ in range(3)])
+    self.ln_f = LayerNorm1d(N_EMBD)
 
     self.lm_head = nn.Linear(N_EMBD, vocab_size) # (b, t, VOCAB_SIZE)
 
@@ -92,6 +96,7 @@ class BigramLanguageModel(nn.Module):
 
     x = tok_embd + pos_emb
     x = self.blocks(x)
+    x = self.ln_f(x)
     logits = self.lm_head(x)
 
     if targets is None:
@@ -115,7 +120,23 @@ class BigramLanguageModel(nn.Module):
   
     return idx
   
-torch.manual_seed(1337)
+class LayerNorm1d(nn.Module):
+  def __init__(self, dim, eps=1e-5):
+    super().__init__()
+    self.eps = eps
+    self.gamma = nn.Parameter(torch.ones(dim))
+    self.beta = nn.Parameter(torch.zeros(dim))
+
+  def forward(self, x):
+    # Support both (B, C) and (B, T, C)
+    if x.dim() == 2:
+      mean = x.mean(-1, keepdim=True)
+      var = x.var(-1, unbiased=False, keepdim=True)
+    else:
+      mean = x.mean(-1, keepdim=True)
+      var = x.var(-1, unbiased=False, keepdim=True)
+    xhat = (x - mean) / torch.sqrt(var + self.eps)
+    return self.gamma * xhat + self.beta
 
 chars = sorted(list(set(text)))
 vocab_size = len(chars)
