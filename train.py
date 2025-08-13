@@ -11,19 +11,27 @@ text = (
     + open("c4.txt", "r", encoding="utf-8", errors="ignore").read()
     + open("closed_factual_questions.txt", "r", encoding="utf-8", errors="ignore").read()
     + open("kys.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("qa.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("books1.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("book2.txt", "r", encoding="utf-8", errors="ignore").read()
 )
 
+# Remove unwanted characters from the text
+UNWANTED_CHARS = "§°ÆÇÉÜàâäæçèéêîóôöùûüœɑɣΔέαβγδεινὶῶ–—‘’“”•™¡£«»¿ÈÓáëíïñõúŒθμοςτ …"
+text = text.translate({ord(c): None for c in UNWANTED_CHARS})
+
+
 SPLIT_PERCENT = 0.9
-CONTEXT_LENGTH = 32
+CONTEXT_LENGTH = 64
 BATCHE_SIZE = 16
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 EVAL_ITERS = 200
-MAX_ITER = 5000
+MAX_ITER = 4000
 LEARNING_RATE = 1e-3
-N_EMBD = 64
+N_EMBD = 128
 N_HEAD = 4
 N_LAYER = 4
-DROPOUT = 0.0
+DROPOUT = 0.1
 
 class Head(nn.Module):
   def __init__(self, head_size: int):
@@ -65,7 +73,7 @@ class FeedForward(nn.Module):
     super().__init__()
     self.net = nn.Sequential(
       nn.Linear(n_embd, n_embd * 4),
-      nn.ReLU(),
+      nn.GELU(),
       nn.Linear(n_embd * 4, n_embd),
       nn.Dropout(DROPOUT),
     )
@@ -187,7 +195,7 @@ def estimate_loss():
 if __name__ == "__main__":
   m = BigramLanguageModel().to(DEVICE)
   num_params = sum(p.numel() for p in m.parameters())
-  print(f"{num_params/1e6:.2f}M parameters ({num_params:,} total)")
+  print(f"{num_params/1e6:.3f}M parameters ({num_params:,} total)")
   optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
 
   # Training loop
