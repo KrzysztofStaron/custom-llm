@@ -191,5 +191,10 @@ for step in range(MAX_ITER):
     loss.backward()
     optimizer.step()
     
+# save trained weights
+save_path = 'model_weights.pt'
+torch.save(m.state_dict(), save_path)
+print(f"Saved model weights to {save_path}")
+
 context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)
 print(tokenizer.decode(m.generate(context, max_new_tokens=300)[0].tolist()))
