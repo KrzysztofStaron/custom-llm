@@ -14,10 +14,12 @@ text = (
     + open("qa.txt", "r", encoding="utf-8", errors="ignore").read()
     + open("books1.txt", "r", encoding="utf-8", errors="ignore").read()
     + open("book2.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("archive/test.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("archive/train.txt", "r", encoding="utf-8", errors="ignore").read()
 )
 
 # Remove unwanted characters from the text
-UNWANTED_CHARS = "§°ÆÇÉÜàâäæçèéêîóôöùûüœɑɣΔέαβγδεινὶῶ–—‘’“”•™¡£«»¿ÈÓáëíïñõúŒθμοςτ …"
+UNWANTED_CHARS = "§°ÆÇÉÜàâäæçèéêîóôöùûüœɑɣΔέαβγδεινὶῶ–—‘’“”•™¡£«»¿ÈÓáëíïñõúŒθμοςτ …~¥±²³µ·½ÁÅÍÎÖ×ØÚÞãåìòøĀāăćčĐđėīŁłńŌōśşšūųŻžơưʻʿ̃κСавекостяاحصلنه्กงณตมยรลัาิ่์გდვზიკორსუცძწხჯ჻ḥṃṅṣṭṯảấầắễệịớửỳ‑„†′″⁄₤€₹⅓⅔→−≤☉♭♯〈〉のァアキスットプュリルヴ・動場大戦攻機殻火礮空隊"
 text = text.translate({ord(c): None for c in UNWANTED_CHARS})
 
 
@@ -26,7 +28,7 @@ CONTEXT_LENGTH = 64
 BATCHE_SIZE = 16
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 EVAL_ITERS = 200
-MAX_ITER = 4000
+MAX_ITER = 10000
 LEARNING_RATE = 1e-3
 N_EMBD = 128
 N_HEAD = 4

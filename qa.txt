@@ -674,3 +674,648 @@ Al-Fatiha
 What is the name of the smallest planet in our solar system?
 Mercury
 
+What is the name of the current Secretary-General of the United Nations?
+António Guterres
+
+What is the name of the process where a liquid turns into a gas?
+Evaporation
+
+What is the name of the first successful vaccine ever developed?
+Smallpox vaccine
+
+What is the name of the largest active volcano in Europe?
+Mount Etna
+
+What is the name of the most abundant gas in Earth's atmosphere?
+Nitrogen
+
+What is the name of the tallest mountain in Africa?
+Mount Kilimanjaro
+
+What famous scientist developed the theory of relativity?
+Albert Einstein
+
+What is the name of the element with the atomic number 1?
+Hydrogen
+
+What is the art of beautiful handwriting called?
+Calligraphy
+
+What is the name of the U.S. national anthem?
+The Star-Spangled Banner
+
+Which organ in the human body filters blood?
+Kidney
+
+What is the name of the branch of mathematics that deals with points, lines, surfaces, and solids?
+Geometry
+
+What is the name of the ship Charles Darwin sailed on?
+The HMS Beagle
+
+What is the name of the longest wall in the world?
+The Great Wall of China
+
+What is the study of weather called?
+Meteorology
+
+What is the name of the first hominin species to use fire?
+Homo erectus
+
+What is the name of the capital of Australia?
+Canberra
+
+What is the name of the first book printed in the English language?
+The Recuyell of the Historyes of Troye
+
+What is the name of the world's largest desert?
+Antarctica
+
+What is the name of the first book of the Hebrew Bible?
+Genesis
+
+Which planet is known as the "Red Planet"?
+Mars
+
+What is the name of the first movie with synchronized sound?
+The Jazz Singer
+
+What is the name of the first artificial satellite launched into space?
+Sputnik 1
+
+What is the hardest known naturally occurring substance?
+Diamond
+
+Which U.S. state is nicknamed the "Sunshine State"?
+Florida
+
+What year did the Titanic sink?
+1912
+
+What is the study of stars called?
+Astronomy
+
+What is the diameter of Earth at the equator?
+Approximately 12,756 kilometers
+
+What is the name of the second planet from the Sun?
+Venus
+
+Which country gifted the Statue of Liberty to the United States?
+France
+
+What is the name of the force that opposes motion between two surfaces in contact?
+Friction
+
+What is the name of the world's largest island?
+Greenland
+
+What is the study of ancient writings called?
+Paleography
+
+Which Italian city is known for its canals?
+Venice
+
+What is the study of the structure of living things called?
+Anatomy
+
+What is the name of the treaty that officially ended World War I?
+The Treaty of Versailles
+
+Which Roman emperor legalized Christianity?
+Constantine I
+
+What is the name of the world's largest rainforest?
+Amazon
+
+What is the name of the first artificial heart successfully implanted in a human?
+Jarvik-7
+
+What is the acceleration due to gravity on Earth?
+9.8 meters per second squared
+
+What is the freezing point of water in Celsius?
+0 degrees Celsius
+
+What is the name of the famous theoretical physicist who wrote "A Brief History of Time?"
+Stephen Hawking
+
+Who developed the polio vaccine?
+Jonas Salk
+
+What is the study of the mind and behavior called?
+Psychology
+
+What is the name of the first hominid to walk upright?
+Australopithecus
+
+What is the SI unit of electric current?
+Ampere
+
+What is the name of the deepest point in the ocean?
+The Challenger Deep
+
+What is the name of the first book in the "Harry Potter" series?
+Harry Potter and the Sorcerer's Stone
+
+What is the standard voltage in a US household electrical outlet?
+120 volts
+
+What is the name of the largest bone in the human body?
+Femur
+
+What is the name of the largest species of bear?
+The polar bear is the largest species of bear.
+
+What is the symbol for gold on the periodic table?
+Au
+
+What is the chemical formula for water?
+H2O
+
+What modern-day country was home to the ancient civilization of Mesopotamia?
+Iraq
+
+What is the name of the currency used in Japan?
+Japanese Yen
+
+What is the Earth's primary source of energy?
+The Sun
+
+What is the name of the company that created the first personal computer?
+Apple
+
+What is the name of the closest major galaxy to the Milky Way?
+Andromeda
+
+What is the name of the first book printed using a printing press?
+The Gutenberg Bible
+
+What is the name of the world's largest volcano?
+Tamu Massif
+
+What animal is the source of cashmere wool?
+A cashmere goat.
+
+What is the name for the number that occurs most often in a set of data?
+Mode
+
+What is the first element on the periodic table?
+Hydrogen
+
+What is the name of the tallest mountain in North America?
+Denali
+
+What is the name of the ship Charles Darwin sailed on for his scientific expedition?
+HMS Beagle
+
+Which U.S. president served during the Civil War?
+Abraham Lincoln
+
+What is the name of the branch of mathematics dealing with points, lines, shapes, and space?
+Geometry
+
+What is the name of the largest country in South America?
+Brazil
+
+What is the name of the Renaissance artist who painted the Sistine Chapel ceiling?
+Michelangelo
+
+What is the technical name for a fear of spiders?
+Arachnophobia
+
+What is the name of the first successful COVID-19 vaccine?
+Pfizer-BioNTech
+
+What is the name of the European peninsula occupied by Spain and Portugal?
+Iberian Peninsula
+
+What is the name of the group of stars forming a recognizable pattern traditionally named after mythological figures or animals?
+Constellation
+
+What is the name of the branch of biology dealing with the study of heredity and variation of inherited characteristics?
+Genetics
+
+What is the name of the part of the plant that conducts water and minerals from the roots?
+Xylem
+
+What is the name of the tallest waterfall in the world?
+Angel Falls
+
+What is the capital of Australia?
+Canberra
+
+What is the name of the first country to give women the right to vote?
+New Zealand
+
+What is the name of the layer of Earth that is made up of tectonic plates?
+The lithosphere
+
+What is the name of the first cloned mammal?
+Dolly the sheep
+
+Who invented the World Wide Web?
+Tim Berners-Lee
+
+What is the name of the river that flows through London?
+The River Thames
+
+What is the name of the nearest star to our Sun?
+Proxima Centauri
+
+Who painted the Mona Lisa?
+Leonardo da Vinci
+
+What is the name of the first satellite launched into space?
+Sputnik 1
+
+What is the speed of light in a vacuum?
+299,792,458 meters per second
+
+What is the name of the North American Great Lake that is entirely within the United States?
+Lake Michigan
+
+What is the name of the largest island in the world?
+Greenland
+
+What is the boiling point of nitrogen?
+-195.8 degrees Celsius
+
+What is the study of fossils called?
+Paleontology
+
+What is the chemical symbol for silver?
+Ag
+
+What is the name of the American inventor of the lightning rod?
+Benjamin Franklin
+
+What is the name of the force that resists motion between surfaces?
+Friction
+
+What is the name of the biggest desert on Earth?
+Antarctic Polar Desert
+
+What is the name of the longest river in Africa?
+The Nile River
+
+What is the name of the galaxy we live in?
+The Milky Way
+
+What is the name of the largest ocean on Earth?
+The Pacific Ocean
+
+What is the name of the first book of the Christian Bible?
+Genesis
+
+What is the capital of Canada?
+Ottawa
+
+What is the standard unit of measurement for electrical resistance?
+Ohm
+
+What is the name of the first artificial satellite to orbit the Moon?
+Luna 10
+
+What is the name of the war that took place between the North and South regions of the United States?
+The American Civil War
+
+What is the closest planet to the Sun?
+Mercury
+
+What is the study of the Earth's atmosphere and weather called?
+Meteorology
+
+What is the name of the first movie to be presented in color?
+A Visit to the Seaside
+
+What is the name of the Italian physicist who invented the battery?
+Alessandro Volta
+
+What is the name of the ancient network of trade routes that connected the East and West?
+The Silk Road
+
+What is the value of pi to two decimal places?
+3.14
+
+What is the name of the process where plants convert light energy into chemical energy?
+Photosynthesis
+
+What is the name of the Earth's only natural satellite?
+The Moon
+
+What is the common name for a group of lions?
+A pride
+
+What is the name of the first permanent English settlement in North America?
+Jamestown
+
+What is the name of the ancient temple complex located in Cambodia?
+Angkor Wat
+
+What is the name of the largest volcano in the Solar System?
+Olympus Mons
+
+What is the name of the first element on the periodic table?
+Hydrogen
+
+What is the name of the mountain range that separates Europe and Asia?
+Ural Mountains
+
+What is the name of the largest hot desert in Asia?
+The Gobi Desert
+
+What is the name of the first book in the Harry Potter series?
+Harry Potter and the Sorcerer's Stone
+
+What is the name of the first book printed on a printing press?
+The Gutenberg Bible
+
+What is the name of the largest state in the United States by area?
+Alaska
+
+What is the name of the war fought between England and France in the 14th and 15th centuries?
+Hundred Years' War
+
+What is the name of the first permanent English settlement in Australia?
+Sydney
+
+What is the name of the first modern Olympic Games host city?
+Athens
+
+What is the name of the largest freshwater lake by surface area?
+Lake Superior
+
+What is the name of the largest active volcano in the world?
+Mauna Loa
+
+What is the name of the branch of mathematics that deals with points, lines, shapes, and spaces?
+Geometry
+
+What is the name of the first hominin species known to use fire?
+Homo erectus
+
+What is the name of the first synthetic plastic?
+Bakelite
+
+What is the name of the largest country in the world by area?
+Russia
+
+What is the name for a polygon with five sides?
+Pentagon
+
+What is the name of the battle that secured Norman control of England?
+Battle of Hastings
+
+What is the name of the first programmable computer?
+Colossus
+
+What is the Roman numeral for 1000?
+M
+
+What is the name of the first hominid?
+Australopithecus
+
+What is the name of the closest star to Earth?
+The Sun
+
+What is the name of the element with the atomic number 8?
+Oxygen
+
+What is the name of the company that first mass-produced automobiles?
+Ford Motor Company
+
+What is the name of the unit of currency used in Japan?
+Japanese Yen
+
+What is the name of the first book of the Torah?
+Genesis
+
+What is the name of the first US president?
+George Washington
+
+What is the boiling point of water at sea level in Celsius?
+100 degrees
+
+What is the chemical symbol for gold?
+Au
+
+What is the name of the longest mountain range in the world?
+The Andes
+
+How many ventricles are in the human heart?
+There are four.
+
+What is the scientific name of the domestic cat?
+Felis catus
+
+What is the name of the first programmable mechanical computer?
+Analytical Engine
+
+What is the name of the first successful vaccine developed by Edward Jenner?
+Smallpox
+
+What is the name of the first human to travel into space?
+Yuri Gagarin
+
+What is the tallest grass on Earth?
+Bamboo
+
+What is the name of the first novel written in English?
+Le Morte d'Arthur
+
+What is the name of the largest moon of Saturn?
+Titan
+
+What is the name of the capital of Canada?
+Ottawa
+
+What is the hardest mineral?
+Diamond
+
+What is the name of the first book written by Stephen King?
+Carrie
+
+What is the name of the first video uploaded to YouTube?
+Me at the zoo
+
+What is the name of the first book in the Bible?
+Genesis
+
+What is the standard atomic weight of carbon?
+Approximately 12.01 atomic mass units
+
+What is the name of the first movie in the Star Wars saga?
+Star Wars: Episode IV - A New Hope
+
+What is the speed of sound at sea level?
+Around 343 meters per second
+
+What country is home to the kangaroo?
+Australia
+
+What is the chemical symbol for iron?
+Fe
+
+What is the name of the first movie released by Pixar?
+Toy Story
+
+What is the name of the first book by Jane Austen?
+Sense and Sensibility
+
+What is the name of the force that pulls objects towards each other?
+Gravity
+
+What is the name of the first book in The Chronicles of Narnia series?
+The Lion, the Witch, and the Wardrobe
+
+What is the name of the first book of The Lord of the Rings?
+The Fellowship of the Ring
+
+What is the name of the biggest planet in our solar system?
+Jupiter
+
+What is the diameter of Earth?
+About 12,742 kilometers.
+
+How many teeth does an adult human typically have?
+Thirty-two.
+
+What is the name of the nearest major galaxy to the Milky Way?
+Andromeda.
+
+What is the largest bone in the human body?
+Femur.
+
+What is the name of Earth's natural satellite?
+The Moon
+
+What is the name of the first living creature successfully cloned?
+Dolly the sheep
+
+Which U.S. state is home to the Grand Canyon?
+Arizona
+
+What is the name for energy stored in an object due to its position?
+Potential energy
+
+What is the name of the first book published in the United States?
+Bay Psalm Book
+
+What is the name of the largest desert on Earth?
+Antarctic Polar Desert
+
+What is the name of the first successful artificial satellite?
+Sputnik 1
+
+What famous city is built on seven hills?
+Rome
+
+What is the name for a shape with eight sides?
+Octagon
+
+What is the name of the biggest island in the world?
+Greenland
+
+What is the name of the Earth's primary source of energy?
+The Sun
+
+What is the study of the Earth's physical structure and substance called?
+Geology
+
+What is the name of the Greek god of the sea?
+Poseidon
+
+What is the name of the first book printed using movable type?
+Gutenberg Bible
+
+What is the name of the world's largest ocean?
+The Pacific Ocean
+
+What is the name of the main protagonist in the Harry Potter series?
+Harry Potter
+
+What is the name of the first book of the New Testament?
+The Gospel of Matthew
+
+What is the chemical symbol for water?
+H2O
+
+What is the name for the distance around a circle?
+Circumference
+
+What is the name of the first book in the Hunger Games trilogy?
+The Hunger Games
+
+What is the name for the number system with base 16?
+Hexadecimal
+
+What is the boiling point of water at sea level?
+100 degrees Celsius
+
+What is the measurement of the angle of a straight line?
+180 degrees
+
+What is the name for the process by which plants convert light energy into chemical energy?
+Photosynthesis
+
+What is the name of the largest continent?
+Asia
+
+What is the name of the largest country by area?
+Russia
+
+What is the name of the first U.S. president?
+George Washington
+
+What is the name of the longest river in the world?
+The Amazon River
+
+What is the name of the ship Christopher Columbus used to discover America?
+Santa Maria
+
+What is the name of the war fought between the North and South regions of the United States?
+The American Civil War
+
+What is the study of stars and celestial objects called?
+Astronomy
+
+What is the capital city of Canada?
+Ottawa
+
+What element has the atomic number 1?
+Hydrogen
+
+What is the name of the first book in the Old Testament?
+Genesis
+
+What is the name of the first manned spaceflight?
+Vostok 1
+
+What is the name of the first modern Olympic Games?
+Athens 1896
+
+What is the name of the first artificial heart implanted in a human?
+Jarvik-7
+
+What is the standard unit of electrical resistance?
+Ohm
+
+What is the name of the first computer programmer?
+Ada Lovelace
+
+What is the name of the ship that Charles Darwin sailed on for his famous voyage?
+The HMS Beagle
+
+What is the name of the first book written by William Shakespeare?
+Henry VI, Part 2
+
+What is the name of the branch of mathematics dealing with points, lines, surfaces, and solids?
+Geometry
+
+Who developed the theory of general relativity?
+Albert Einstein
+
+What is the name for a triangle with all sides of different lengths?
+Scalene
+
