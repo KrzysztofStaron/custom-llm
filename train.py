@@ -1,5 +1,7 @@
 import torch
 from tokenizer import Tokenizer
+from torch.nn import functional as F
+import torch.nn as nn
 
 text = open("input.txt", "r").read()
 
@@ -9,7 +11,48 @@ BATCHE_SIZE = 4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 EVAL_ITERS = 200
 MAX_ITER = 3000
+N_EMBD = 32
 
+
+class BigramLanguageModel(nn.Module):
+  def __init__(self):
+    super().__init__()
+    self.token_embedding_table = nn.Embedding(vocab_size, N_EMBD)
+    self.pos_embedding_table = nn.Embedding(CONTEXT_LENGTH, N_EMBD)
+    self.lm_head = nn.Linear(N_EMBD, vocab_size) # (b, t, VOCAB_SIZE)
+
+  def forward(self, idx, targets=None):
+
+    B, T = idx.shape
+
+    tok_embd = self.token_embedding_table(idx)
+    pos_emb = self.pos_embedding_table(torch.arange(T, device=DEVICE))
+    x = tok_embd + pos_emb
+    logits = self.lm_head(x)
+
+    if targets is None:
+      loss = None
+    else:
+      B, T, C = logits.shape
+
+      logits = logits.view(B * T, C)
+      targets = targets.view(B * T)
+
+      loss = F.cross_entropy(logits, targets)
+
+    return logits, loss
+  
+  def generate(self, idx, max_new_tokens):
+    for _ in range(max_new_tokens):
+      idx_cond = idx[:, -CONTEXT_LENGTH:]
+      logits, loss = self(idx_cond)
+      logits = logits[:, -1, :]
+      probs = F.softmax(logits, dim=-1)
+      idx_next = torch.multinomial(probs, num_samples=1)
+      idx = torch.cat((idx, idx_next), dim=1)
+  
+    return idx
+  
 torch.manual_seed(1337)
 
 chars = sorted(list(set(text)))
@@ -60,9 +103,8 @@ for b in range(BATCHE_SIZE):
     target = y[b, t]
 
 
-from bigramLM import BigramLanguageModel
 
-m = BigramLanguageModel(vocab_size).to(DEVICE)
+m = BigramLanguageModel().to(DEVICE)
 optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
 
 # Training loop
@@ -88,23 +130,26 @@ x = torch.randn(B, T, C)
 print(x.shape)
 print(x)
 
-# v1
-xbow = torch.zeros((B, T, C))
-for b in range(B):
-  for t in range(T):
-    xprev = x[b, :t+1]
-    xbow[b, t] = torch.mean(xprev, dim=0)
-# v2
-wei = torch.tril(torch.ones(T, T))
-wei = wei/torch.sum(wei, dim=1, keepdim=True)
-xbow2 = wei @ x
 
-#v3
+
+
+head_size = 16
+key = nn.Linear(C, head_size, bias=False)
+query = nn.Linear(C, head_size, bias=False)
+value = nn.Linear(C, head_size, bias=False)
+
+k = key(x)
+q = query(x)
+wei = q @ k.transpose(-2, -1) * head_size**-0.5
+
 tril = torch.tril(torch.ones(T, T))
-wei = torch.zeros((T, T))
 wei = wei.masked_fill(tril == 0, float('-inf'))
 wei = F.softmax(wei, dim=-1)
-xbow3 = wei @ x
+
+v=value(x)
+output = wei @ v
+
+print(output.shape)
 
 
 
