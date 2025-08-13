@@ -88,11 +88,24 @@ x = torch.randn(B, T, C)
 print(x.shape)
 print(x)
 
+# v1
 xbow = torch.zeros((B, T, C))
 for b in range(B):
   for t in range(T):
     xprev = x[b, :t+1]
     xbow[b, t] = torch.mean(xprev, dim=0)
+# v2
+wei = torch.tril(torch.ones(T, T))
+wei = wei/torch.sum(wei, dim=1, keepdim=True)
+xbow2 = wei @ x
+
+#v3
+tril = torch.tril(torch.ones(T, T))
+wei = torch.zeros((T, T))
+wei = wei.masked_fill(tril == 0, float('-inf'))
+wei = F.softmax(wei, dim=-1)
+xbow3 = wei @ x
+
 
 
 
