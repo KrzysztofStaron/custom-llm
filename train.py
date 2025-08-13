@@ -9,8 +9,9 @@ SPLIT_PERCENT = 0.9
 CONTEXT_LENGTH = 8
 BATCHE_SIZE = 4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
-EVAL_ITERS = 200
-MAX_ITER = 10000
+print(DEVICE)
+EVAL_ITERS = 500
+MAX_ITER = 5000
 LEARNING_RATE = 1e-3
 N_EMBD = 32
 
@@ -42,6 +43,19 @@ class MultiHeadAttention(nn.Module):
 
   def forward(self, x: torch.Tensor) -> torch.Tensor:
       return torch.cat([h(x) for h in self.heads], dim=-1)
+  
+class FeedForward(nn.Module):
+
+  def __init__(self, n_embd):
+    super().__init__()
+    self.net = nn.Sequential(
+      nn.Linear(n_embd, n_embd),
+      nn.ReLU(),
+    )
+
+  def forward(self, x):
+    return self.net(x)
+
 
 class BigramLanguageModel(nn.Module):
   def __init__(self):
@@ -49,6 +63,7 @@ class BigramLanguageModel(nn.Module):
     self.token_embedding_table = nn.Embedding(vocab_size, N_EMBD)
     self.pos_embedding_table = nn.Embedding(CONTEXT_LENGTH, N_EMBD)
     self.sa_head = MultiHeadAttention(4, N_EMBD//4)
+    self.ffwd = FeedForward(N_EMBD)
     self.lm_head = nn.Linear(N_EMBD, vocab_size) # (b, t, VOCAB_SIZE)
 
   def forward(self, idx, targets=None):
@@ -59,6 +74,7 @@ class BigramLanguageModel(nn.Module):
 
     x = tok_embd + pos_emb
     x = self.sa_head(x)
+    x = self.ffwd(x)
     logits = self.lm_head(x)
 
     if targets is None:
@@ -92,7 +108,6 @@ tokenizer = Tokenizer(chars)
 
 data = torch.tensor(tokenizer.encode(text))
 print(data.shape, data.dtype)
-print(data)
 
 
 n = int(SPLIT_PERCENT * len(data))
@@ -157,7 +172,6 @@ B, T, C = 4, 8, 4
 x = torch.randn(B, T, C)
 
 print(x.shape)
-print(x)
 
 
 
