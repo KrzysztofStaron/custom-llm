@@ -671,3 +671,6 @@ Augustus
 What is the name of the first book in the Quran?
 Al-Fatiha
 
+What is the name of the smallest planet in our solar system?
+Mercury
+
