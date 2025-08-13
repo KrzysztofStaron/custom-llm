@@ -3,7 +3,15 @@ from tokenizer import Tokenizer
 from torch.nn import functional as F
 import torch.nn as nn
 
-text = open("input.txt", "r").read()
+text = (
+    open("input.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("c.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("c2.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("c3.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("c4.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("closed_factual_questions.txt", "r", encoding="utf-8", errors="ignore").read()
+    + open("kys.txt", "r", encoding="utf-8", errors="ignore").read()
+)
 
 SPLIT_PERCENT = 0.9
 CONTEXT_LENGTH = 32
@@ -143,6 +151,7 @@ class LayerNorm1d(nn.Module):
     return self.gamma * xhat + self.beta
 
 chars = sorted(list(set(text)))
+print("".join(chars))
 vocab_size = len(chars)
 
 tokenizer = Tokenizer(chars)
@@ -175,26 +184,38 @@ def estimate_loss():
   m.train()
   return losses
 
-m = BigramLanguageModel().to(DEVICE)
-optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
+if __name__ == "__main__":
+  m = BigramLanguageModel().to(DEVICE)
+  num_params = sum(p.numel() for p in m.parameters())
+  print(f"{num_params/1e6:.2f}M parameters ({num_params:,} total)")
+  optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
 
-# Training loop
-for step in range(MAX_ITER):
-    if step % EVAL_ITERS == 0:
-      losses = estimate_loss()
-      print(f"step {step}, train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+  # Training loop
+  for step in range(MAX_ITER):
+      if step % EVAL_ITERS == 0:
+        losses = estimate_loss()
+        print(f"step {step}, train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
 
-    xb, yb = get_batch("train")
+      xb, yb = get_batch("train")
 
-    logits, loss = m(xb, yb)
-    optimizer.zero_grad(set_to_none=True)
-    loss.backward()
-    optimizer.step()
-    
-# save trained weights
-save_path = 'model_weights.pt'
-torch.save(m.state_dict(), save_path)
-print(f"Saved model weights to {save_path}")
+      logits, loss = m(xb, yb)
+      optimizer.zero_grad(set_to_none=True)
+      loss.backward()
+      optimizer.step()
+      
+  # save trained weights
+  save_path = 'model_weights.pt'
+  torch.save(m.state_dict(), save_path)
+  print(f"Saved model weights to {save_path}")
 
-context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)
-print(tokenizer.decode(m.generate(context, max_new_tokens=300)[0].tolist()))
+  # Generate 1000 tokens just for fun
+  m.eval()
+  tokenizer = Tokenizer(chars)
+  context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)  # start token (assume 0)
+  generated_tokens = m.generate(context, max_new_tokens=1000)[0].tolist()
+  generated_text = tokenizer.decode(generated_tokens)
+  print("\n--- Generated Sample (1000 tokens) ---\n")
+  print(generated_text)
+  print("\n--- End of Sample ---\n")
+
+
