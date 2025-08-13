@@ -24,6 +24,7 @@ class Head(nn.Module):
     self.query = nn.Linear(N_EMBD, head_size, bias=False)
     self.value = nn.Linear(N_EMBD, head_size, bias=False)
     self.register_buffer("tril", torch.tril(torch.ones(CONTEXT_LENGTH, CONTEXT_LENGTH)))
+    self.dropout = nn.Dropout(DROPOUT)
 
   def forward(self, x: torch.Tensor) -> torch.Tensor:
     B, T, C = x.shape
@@ -32,6 +33,7 @@ class Head(nn.Module):
     wei = q @ k.transpose(-2, -1) * (k.shape[-1] ** -0.5)
     wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
     wei = F.softmax(wei, dim=-1)
+    wei = self.dropout(wei)
     v = self.value(x)
     out = wei @ v
     return out
@@ -42,10 +44,11 @@ class MultiHeadAttention(nn.Module):
     super().__init__()
     self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
     self.proj = nn.Linear(N_EMBD, N_EMBD)
+    self.dropout = nn.Dropout(DROPOUT)
 
   def forward(self, x: torch.Tensor) -> torch.Tensor:
       out = torch.cat([h(x) for h in self.heads], dim=-1)
-      out = self.proj(out)
+      out = self.dropout(self.proj(out))
       return out
   
 class FeedForward(nn.Module):
@@ -56,6 +59,7 @@ class FeedForward(nn.Module):
       nn.Linear(n_embd, n_embd * 4),
       nn.ReLU(),
       nn.Linear(n_embd * 4, n_embd),
+      nn.Dropout(DROPOUT),
     )
 
   def forward(self, x):
@@ -83,7 +87,7 @@ class BigramLanguageModel(nn.Module):
     self.pos_embedding_table = nn.Embedding(CONTEXT_LENGTH, N_EMBD)
 
     
-    self.blocks = nn.Sequential(*[Block(N_EMBD, n_head=4) for _ in range(3)])
+    self.blocks = nn.Sequential(*[Block(N_EMBD, n_head=N_HEAD) for _ in range(N_LAYER)])
     self.ln_f = LayerNorm1d(N_EMBD)
 
     self.lm_head = nn.Linear(N_EMBD, vocab_size) # (b, t, VOCAB_SIZE)
@@ -141,17 +145,13 @@ class LayerNorm1d(nn.Module):
 chars = sorted(list(set(text)))
 vocab_size = len(chars)
 
-
 tokenizer = Tokenizer(chars)
 
 data = torch.tensor(tokenizer.encode(text))
-print(data.shape, data.dtype)
-
 
 n = int(SPLIT_PERCENT * len(data))
 train_data = data[:n]
 val_data = data[n:]
-print(train_data.shape, val_data.shape)
 
 def get_batch(split):
   data = train_data if split == "train" else val_data
@@ -175,17 +175,6 @@ def estimate_loss():
   m.train()
   return losses
 
-# generating batches from train data
-x, y = get_batch("train")
-
-# Generating training sets from batches
-for b in range(BATCHE_SIZE):
-  for t in range(CONTEXT_LENGTH):
-    context = x[b, :t+1]
-    target = y[b, t]
-
-
-
 m = BigramLanguageModel().to(DEVICE)
 optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
 
@@ -202,18 +191,5 @@ for step in range(MAX_ITER):
     loss.backward()
     optimizer.step()
     
-print(loss.item())
 context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)
 print(tokenizer.decode(m.generate(context, max_new_tokens=300)[0].tolist()))
-
-B, T, C = 4, 8, 4
-x = torch.randn(B, T, C)
-
-print(x.shape)
-
-
-
-
-
-
-
