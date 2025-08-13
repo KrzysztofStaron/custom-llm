@@ -10,8 +10,29 @@ CONTEXT_LENGTH = 8
 BATCHE_SIZE = 4
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 EVAL_ITERS = 200
-MAX_ITER = 3000
+MAX_ITER = 10000
+LEARNING_RATE = 1e-3
 N_EMBD = 32
+
+
+class Head(nn.Module):
+  def __init__(self, head_size: int):
+    super().__init__()
+    self.key = nn.Linear(N_EMBD, head_size, bias=False)
+    self.query = nn.Linear(N_EMBD, head_size, bias=False)
+    self.value = nn.Linear(N_EMBD, head_size, bias=False)
+    self.register_buffer("tril", torch.tril(torch.ones(CONTEXT_LENGTH, CONTEXT_LENGTH)))
+
+  def forward(self, x: torch.Tensor) -> torch.Tensor:
+    B, T, C = x.shape
+    k = self.key(x)
+    q = self.query(x)
+    attn_scores = q @ k.transpose(-2, -1) * (k.shape[-1] ** -0.5)
+    attn_scores = attn_scores.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
+    attn_weights = F.softmax(attn_scores, dim=-1)
+    v = self.value(x)
+    out = attn_weights @ v
+    return out
 
 
 class BigramLanguageModel(nn.Module):
@@ -19,32 +40,32 @@ class BigramLanguageModel(nn.Module):
     super().__init__()
     self.token_embedding_table = nn.Embedding(vocab_size, N_EMBD)
     self.pos_embedding_table = nn.Embedding(CONTEXT_LENGTH, N_EMBD)
+    self.sa_head = Head(N_EMBD)
     self.lm_head = nn.Linear(N_EMBD, vocab_size) # (b, t, VOCAB_SIZE)
 
   def forward(self, idx, targets=None):
-
     B, T = idx.shape
 
     tok_embd = self.token_embedding_table(idx)
     pos_emb = self.pos_embedding_table(torch.arange(T, device=DEVICE))
+
     x = tok_embd + pos_emb
+    x = self.sa_head(x)
     logits = self.lm_head(x)
 
     if targets is None:
       loss = None
     else:
       B, T, C = logits.shape
-
       logits = logits.view(B * T, C)
       targets = targets.view(B * T)
-
       loss = F.cross_entropy(logits, targets)
 
     return logits, loss
   
   def generate(self, idx, max_new_tokens):
     for _ in range(max_new_tokens):
-      idx_cond = idx[:, -CONTEXT_LENGTH:]
+      idx_cond = idx[:, -CONTEXT_LENGTH:] # crop the context
       logits, loss = self(idx_cond)
       logits = logits[:, -1, :]
       probs = F.softmax(logits, dim=-1)
@@ -105,7 +126,7 @@ for b in range(BATCHE_SIZE):
 
 
 m = BigramLanguageModel().to(DEVICE)
-optimizer = torch.optim.AdamW(m.parameters(), lr=1e-3)
+optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
 
 # Training loop
 for step in range(MAX_ITER):
@@ -129,31 +150,6 @@ x = torch.randn(B, T, C)
 
 print(x.shape)
 print(x)
-
-
-
-
-head_size = 16
-key = nn.Linear(C, head_size, bias=False)
-query = nn.Linear(C, head_size, bias=False)
-value = nn.Linear(C, head_size, bias=False)
-
-k = key(x)
-q = query(x)
-wei = q @ k.transpose(-2, -1) * head_size**-0.5
-
-tril = torch.tril(torch.ones(T, T))
-wei = wei.masked_fill(tril == 0, float('-inf'))
-wei = F.softmax(wei, dim=-1)
-
-v=value(x)
-output = wei @ v
-
-print(output.shape)
-
-
-
-
 
 
 
