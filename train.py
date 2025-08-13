@@ -27,20 +27,28 @@ class Head(nn.Module):
     B, T, C = x.shape
     k = self.key(x)
     q = self.query(x)
-    attn_scores = q @ k.transpose(-2, -1) * (k.shape[-1] ** -0.5)
-    attn_scores = attn_scores.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
-    attn_weights = F.softmax(attn_scores, dim=-1)
+    wei = q @ k.transpose(-2, -1) * (k.shape[-1] ** -0.5)
+    wei = wei.masked_fill(self.tril[:T, :T] == 0, float('-inf'))
+    wei = F.softmax(wei, dim=-1)
     v = self.value(x)
-    out = attn_weights @ v
+    out = wei @ v
     return out
 
+
+class MultiHeadAttention(nn.Module):
+  def __init__(self, num_heads: int, head_size: int):
+    super().__init__()
+    self.heads = nn.ModuleList([Head(head_size) for _ in range(num_heads)])
+
+  def forward(self, x: torch.Tensor) -> torch.Tensor:
+      return torch.cat([h(x) for h in self.heads], dim=-1)
 
 class BigramLanguageModel(nn.Module):
   def __init__(self):
     super().__init__()
     self.token_embedding_table = nn.Embedding(vocab_size, N_EMBD)
     self.pos_embedding_table = nn.Embedding(CONTEXT_LENGTH, N_EMBD)
-    self.sa_head = Head(N_EMBD)
+    self.sa_head = MultiHeadAttention(4, N_EMBD//4)
     self.lm_head = nn.Linear(N_EMBD, vocab_size) # (b, t, VOCAB_SIZE)
 
   def forward(self, idx, targets=None):
