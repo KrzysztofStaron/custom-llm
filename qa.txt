@@ -1319,3 +1319,48 @@ Albert Einstein
 What is the name for a triangle with all sides of different lengths?
 Scalene
 
+What is the name of the company that created the first commercially available personal computer?
+Micro Instrumentation and Telemetry Systems
+
+What is the study of insects called?
+Entomology
+
+What is the name of the gentleman who invented the telephone?
+Alexander Graham Bell
+
+What is the smallest country in the world?
+Vatican City
+
+What is the name of the closest planet to the Sun?
+Mercury
+
+What is the name of the first successful vaccine developed?
+Smallpox
+
+What is the value of pi, rounded to two decimal places?
+3.14
+
+What is the name of the first movie ever made?
+Roundhay Garden Scene
+
+What is the name of the Earth's natural satellite?
+The Moon
+
+What is the name of the first known hominin species to use fire?
+Homo erectus
+
+What is the name of the force that attracts objects with mass towards each other?
+Gravity
+
+What is the name of the first book of the Bible?
+Genesis
+
+What is the name of the largest species of shark?
+Great White Shark
+
+What is the name of the tallest mountain in the world?
+Mount Everest
+
+What is the name of the first artificial satellite to orbit the Earth?
+Sputnik 1
+
