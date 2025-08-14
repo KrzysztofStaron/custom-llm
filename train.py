@@ -35,6 +35,7 @@ N_HEAD = 4
 N_LAYER = 4
 DROPOUT = 0.1
 
+
 class Head(nn.Module):
   def __init__(self, head_size: int):
     super().__init__()
