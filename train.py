@@ -4,18 +4,7 @@ from torch.nn import functional as F
 import torch.nn as nn
 
 text = (
-    open("input.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("c.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("c2.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("c3.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("c4.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("closed_factual_questions.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("kys.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("qa.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("books1.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("book2.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("archive/test.txt", "r", encoding="utf-8", errors="ignore").read()
-    + open("archive/train.txt", "r", encoding="utf-8", errors="ignore").read()
+    open("data/dataset.txt", "r", encoding="utf-8", errors="ignore").read()
 )
 
 # Remove unwanted characters from the text
