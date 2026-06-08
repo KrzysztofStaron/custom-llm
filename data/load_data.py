@@ -20,7 +20,7 @@ def yield_rows(ds, token_limit):
             skipped += 1
             continue
         yield text
-        acc += row["token_length"]
+        acc += len(text)/2.662
         if acc >= token_limit:
             break
     print(f"Skipped {skipped} rows with unwanted characters")
