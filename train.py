@@ -1,5 +1,5 @@
 import torch
-from tokenizer import BPETokenizer, Tokenizer
+from tokenizer import BPETokenizer
 from torch.nn import functional as F
 import torch.nn as nn
 
@@ -18,6 +18,7 @@ N_EMBD = 128
 N_HEAD = 4
 N_LAYER = 4
 DROPOUT = 0.1
+TOKENIZER_VERSION = "byte-bpe-v2"
 
 
 class Head(nn.Module):
@@ -145,7 +146,7 @@ class LayerNorm1d(nn.Module):
     xhat = (x - mean) / torch.sqrt(var + self.eps)
     return self.gamma * xhat + self.beta
 
-tokenizer = BPETokenizer("byte-bpe-v2")
+tokenizer = BPETokenizer(TOKENIZER_VERSION)
 vocab_size = tokenizer.vocab_size
 
 data = torch.tensor(tokenizer.encode(text))
@@ -202,7 +203,6 @@ if __name__ == "__main__":
 
   # Generate 1000 tokens just for fun
   m.eval()
-  tokenizer = Tokenizer(chars)
   context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)  # start token (assume 0)
   generated_tokens = m.generate(context, max_new_tokens=1000)[0].tolist()
   generated_text = tokenizer.decode(generated_tokens)
