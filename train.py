@@ -7,10 +7,6 @@ text = (
     open("data/dataset.txt", "r", encoding="utf-8", errors="ignore").read()
 )
 
-# Remove unwanted characters from the text
-UNWANTED_CHARS = "§°ÆÇÉÜàâäæçèéêîóôöùûüœɑɣΔέαβγδεινὶῶ–—‘’“”•™¡£«»¿ÈÓáëíïñõúŒθμοςτ …~¥±²³µ·½ÁÅÍÎÖ×ØÚÞãåìòøĀāăćčĐđėīŁłńŌōśşšūųŻžơưʻʿ̃κСавекостяاحصلنه्กงณตมยรลัาิ่์გდვზიკორსუცძწხჯ჻ḥṃṅṣṭṯảấầắễệịớửỳ‑„†′″⁄₤€₹⅓⅔→−≤☉♭♯〈〉のァアキスットプュリルヴ・動場大戦攻機殻火礮空隊"
-text = text.translate({ord(c): None for c in UNWANTED_CHARS})
-
 
 SPLIT_PERCENT = 0.9
 CONTEXT_LENGTH = 64
