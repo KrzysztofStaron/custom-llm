@@ -1,12 +1,11 @@
 import torch
-from tokenizer import Tokenizer
+from tokenizer import BPETokenizer, Tokenizer
 from torch.nn import functional as F
 import torch.nn as nn
 
 text = (
     open("data/dataset.txt", "r", encoding="utf-8", errors="ignore").read()
 )
-
 
 SPLIT_PERCENT = 0.9
 CONTEXT_LENGTH = 64
@@ -146,11 +145,8 @@ class LayerNorm1d(nn.Module):
     xhat = (x - mean) / torch.sqrt(var + self.eps)
     return self.gamma * xhat + self.beta
 
-chars = sorted(list(set(text)))
-print("".join(chars))
-vocab_size = len(chars)
-
-tokenizer = Tokenizer(chars)
+tokenizer = BPETokenizer("byte-bpe-v2")
+vocab_size = tokenizer.vocab_size
 
 data = torch.tensor(tokenizer.encode(text))
 
