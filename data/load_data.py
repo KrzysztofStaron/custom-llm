@@ -3,6 +3,7 @@ from datasets import load_dataset
 from clean import has_unwanted_chars, strip_markdown
 
 TARGET_TOKENS = 20e6
+CHARS_PER_TOKEN = 2.662
 
 ds = load_dataset(
     "parquet",
@@ -20,7 +21,7 @@ def yield_rows(ds, token_limit):
             skipped += 1
             continue
         yield text
-        acc += len(text)/2.662
+        acc += len(text)/CHARS_PER_TOKEN
         if acc >= token_limit:
             break
     print(f"Skipped {skipped} rows with unwanted characters")
