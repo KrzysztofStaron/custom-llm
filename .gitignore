@@ -16,3 +16,6 @@ dataset.txt
 data/dataset.txt
 data/dataset_tokens*.bin
 data/dataset_tokens*.bin.meta.json
+
+/mimi-256-11/
+/models
