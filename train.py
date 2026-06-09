@@ -7,8 +7,11 @@ import torch.nn as nn
 DATA_PATH = Path("data/dataset.txt")
 MODEL_NAME = "mimi-256-11"
 SPLIT_PERCENT = 0.9
+TARGET_DATASET_TOKENS = 26_000_190
 CONTEXT_LENGTH = 256
 BATCHE_SIZE = 128
+TOKENS_PER_STEP = BATCHE_SIZE * CONTEXT_LENGTH
+MAX_ITER = int(TARGET_DATASET_TOKENS * SPLIT_PERCENT) // TOKENS_PER_STEP
 DEVICE = (
   'cuda' if torch.cuda.is_available()
   else 'mps' if torch.backends.mps.is_available()
@@ -24,6 +27,12 @@ CHECKPOINTS_DIR = MODEL_DIR / "checkpoints"
 WEIGHTS_PATH = MODEL_DIR / "model_weights.pt"
 SAMPLES_DIR = MODEL_DIR / "samples"
 
+N_EMBD = 128
+N_HEAD = 4
+N_LAYER = 4
+DROPOUT = 0.1
+TOKENIZER_VERSION = "byte-bpe-v3"
+
 
 def checkpoint_path_for_step(step: int) -> Path:
   return CHECKPOINTS_DIR / f"checkpoint_{step}.pt"
@@ -38,13 +47,6 @@ def latest_checkpoint_path() -> Path | None:
     return None
 
   return max(checkpoints, key=lambda path: int(path.stem.split("_")[-1]))
-
-N_EMBD = 128
-N_HEAD = 4
-N_LAYER = 4
-DROPOUT = 0.1
-TOKENIZER_VERSION = "byte-bpe-v3"
-
 
 class Head(nn.Module):
   def __init__(self, head_size: int):
@@ -270,12 +272,12 @@ if __name__ == "__main__":
   optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
   step = load_checkpoint(m, optimizer)
 
-  print("Training until manually stopped (Ctrl+C).")
+  train_tokens = int(TARGET_DATASET_TOKENS * SPLIT_PERCENT)
+  print(f"Training for {MAX_ITER:,} steps ({train_tokens:,} train tokens, {TOKENS_PER_STEP:,} tokens/step).")
   print(f"Checkpoint + sample every {CHECKPOINT_INTERVAL:,} steps.")
 
-  # Training loop
   try:
-    while True:
+    while step < MAX_ITER:
       if step % EVAL_INTERVAL == 0:
         losses = estimate_loss()
         print(f"step {step}, train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
@@ -292,6 +294,11 @@ if __name__ == "__main__":
         save_sample(m, step)
   except KeyboardInterrupt:
     save_checkpoint(m, optimizer, step)
-    print(f"\nStopped at step {step}. Checkpoint saved.")
+    print(f"\nStopped early at step {step}. Checkpoint saved.")
+    raise SystemExit(0)
+
+  save_checkpoint(m, optimizer, step)
+  save_sample(m, step)
+  print(f"Finished training at step {step}.")
 
 
