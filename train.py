@@ -7,11 +7,10 @@ import torch.nn as nn
 DATA_PATH = Path("data/dataset.txt")
 MODEL_NAME = "mimi-256-11"
 SPLIT_PERCENT = 0.9
-TARGET_DATASET_TOKENS = 26_000_190
+EPOCHS = 1
 CONTEXT_LENGTH = 256
 BATCHE_SIZE = 128
 TOKENS_PER_STEP = BATCHE_SIZE * CONTEXT_LENGTH
-MAX_ITER = int(TARGET_DATASET_TOKENS * SPLIT_PERCENT) // TOKENS_PER_STEP
 DEVICE = (
   'cuda' if torch.cuda.is_available()
   else 'mps' if torch.backends.mps.is_available()
@@ -272,12 +271,14 @@ if __name__ == "__main__":
   optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
   step = load_checkpoint(m, optimizer)
 
-  train_tokens = int(TARGET_DATASET_TOKENS * SPLIT_PERCENT)
-  print(f"Training for {MAX_ITER:,} steps ({train_tokens:,} train tokens, {TOKENS_PER_STEP:,} tokens/step).")
+  steps_per_epoch = len(train_data) // TOKENS_PER_STEP
+  max_iter = steps_per_epoch * EPOCHS
+  print(f"Dataset: {len(train_data) + len(val_data):,} tokens ({len(train_data):,} train / {len(val_data):,} val)")
+  print(f"Training for {max_iter:,} steps ({EPOCHS} epochs x {steps_per_epoch:,} steps/epoch, {TOKENS_PER_STEP:,} tokens/step).")
   print(f"Checkpoint + sample every {CHECKPOINT_INTERVAL:,} steps.")
 
   try:
-    while step < MAX_ITER:
+    while step < max_iter:
       if step % EVAL_INTERVAL == 0:
         losses = estimate_loss()
         print(f"step {step}, train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")

@@ -63,20 +63,12 @@ class BPETokenizer:
     return token_ids.tolist()
 
   def encode(self, text):
-    token_ids = list(text.encode("utf-8"))
-    for left, right, new_id in self.merges:
-      merged = []
-      i = 0
-      while i < len(token_ids):
-        if i < len(token_ids) - 1 and token_ids[i] == left and token_ids[i + 1] == right:
-          merged.append(new_id)
-          i += 2
-        else:
-          merged.append(token_ids[i])
-          i += 1
-      token_ids = merged
+    if isinstance(text, str):
+      raw_bytes = text.encode("utf-8")
+    else:
+      raw_bytes = text
 
-    return token_ids
+    return encode_bytes(raw_bytes, self.merges)
 
   def decode(self, int_arr):
     output_bytes = bytearray()
@@ -85,4 +77,26 @@ class BPETokenizer:
 
     return bytes(output_bytes).decode("utf-8", errors="replace")
 
+
+def merge_pair_array(token_ids: array, left: int, right: int, new_id: int) -> array:
+  merged = array("I")
+  i = 0
+  n = len(token_ids)
+  while i < n:
+    if i < n - 1 and token_ids[i] == left and token_ids[i + 1] == right:
+      merged.append(new_id)
+      i += 2
+    else:
+      merged.append(token_ids[i])
+      i += 1
+  return merged
+
+
+def encode_bytes(raw_bytes: bytes, merges: list[tuple[int, int, int]]) -> list[int]:
+  token_ids = array("I", list(raw_bytes))
+  for left, right, new_id in merges:
+    if len(token_ids) < 2:
+      break
+    token_ids = merge_pair_array(token_ids, left, right, new_id)
+  return token_ids.tolist()
 
