@@ -19,7 +19,17 @@ def _is_table_line(line: str) -> bool:
 def strip_markdown(text: str) -> str:
     text = _FENCED_CODE.sub("", text)
     text = re.sub(r"^```[^\n]*$", "", text, flags=re.MULTILINE)
-    lines = [line for line in text.split("\n") if not _is_table_line(line)]
+    text = re.sub(r"\*\*(.+?)\*\*", r"\1", text)
+    text = re.sub(r"(?<!\*)\*([^*\n]+?)\*(?!\*)", r"\1", text)
+
+    lines = []
+    for line in text.split("\n"):
+        stripped = line.strip()
+        if _is_table_line(line):
+            continue
+        if re.fullmatch(r"-+", stripped):
+            continue
+        lines.append(line)
     return "\n".join(lines)
 
 

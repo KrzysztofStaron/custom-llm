@@ -3,7 +3,7 @@ import train as train_mod
 
 # Recreate model and load trained weights
 m = train_mod.BigramLanguageModel().to(train_mod.DEVICE)
-state_dict = torch.load("model_weights.pt", map_location=train_mod.DEVICE)
+state_dict = torch.load(train_mod.WEIGHTS_PATH, map_location=train_mod.DEVICE)
 m.load_state_dict(state_dict)
 m.eval()
 

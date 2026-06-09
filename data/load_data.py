@@ -3,7 +3,7 @@ from datasets import load_dataset
 from clean import has_unwanted_chars, strip_markdown
 
 TARGET_TOKENS = 20e6
-CHARS_PER_TOKEN = 2.662
+CHARS_PER_TOKEN = 3.323
 
 ds = load_dataset(
     "parquet",

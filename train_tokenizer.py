@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-TOKENIZER_VERSION = "byte-bpe-v2"
+TOKENIZER_VERSION = "byte-bpe-v3"
 BASE_VOCAB_SIZE = 256
 DEFAULT_INPUT_PATH = Path("data/dataset.txt")
-DEFAULT_TARGET_VOCAB_SIZE = 1024
+DEFAULT_TARGET_VOCAB_SIZE = 2048
 DEFAULT_MAX_BYTES = 2_000_000
 MIN_PAIR_FREQUENCY = 2
 MERGE_LOG_EVERY = 100

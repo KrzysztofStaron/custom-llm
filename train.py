@@ -1,29 +1,49 @@
 import torch
+from pathlib import Path
 from tokenizer import BPETokenizer
 from torch.nn import functional as F
 import torch.nn as nn
 
-text = (
-    open("data/dataset.txt", "r", encoding="utf-8", errors="ignore").read()
-)
-
+DATA_PATH = Path("data/dataset.txt")
+MODEL_NAME = "mimi-256-11"
 SPLIT_PERCENT = 0.9
-CONTEXT_LENGTH = 128
+CONTEXT_LENGTH = 256
 BATCHE_SIZE = 128
 DEVICE = (
   'cuda' if torch.cuda.is_available()
   else 'mps' if torch.backends.mps.is_available()
   else 'cpu'
 )
-EVAL_ITERS = 50
-EVAL_INTERVAL = 200
-MAX_ITER = 10000
+EVAL_ITERS = 75
+EVAL_INTERVAL = 500
+CHECKPOINT_INTERVAL = 10000
+SAMPLE_TOKENS = 1000
 LEARNING_RATE = 1e-3
+MODEL_DIR = Path(MODEL_NAME)
+CHECKPOINTS_DIR = MODEL_DIR / "checkpoints"
+WEIGHTS_PATH = MODEL_DIR / "model_weights.pt"
+SAMPLES_DIR = MODEL_DIR / "samples"
+
+
+def checkpoint_path_for_step(step: int) -> Path:
+  return CHECKPOINTS_DIR / f"checkpoint_{step}.pt"
+
+
+def latest_checkpoint_path() -> Path | None:
+  if not CHECKPOINTS_DIR.exists():
+    return None
+
+  checkpoints = list(CHECKPOINTS_DIR.glob("checkpoint_*.pt"))
+  if not checkpoints:
+    return None
+
+  return max(checkpoints, key=lambda path: int(path.stem.split("_")[-1]))
+
 N_EMBD = 128
 N_HEAD = 4
 N_LAYER = 4
 DROPOUT = 0.1
-TOKENIZER_VERSION = "byte-bpe-v2"
+TOKENIZER_VERSION = "byte-bpe-v3"
 
 
 class Head(nn.Module):
@@ -153,17 +173,24 @@ class LayerNorm1d(nn.Module):
 
 tokenizer = BPETokenizer(TOKENIZER_VERSION)
 vocab_size = tokenizer.vocab_size
+train_data = None
+val_data = None
 
-cached_token_ids = tokenizer.load_dataset_tokens_if_version_matches()
-if cached_token_ids is not None:
-  print(f"Loaded cached dataset token ids ({len(cached_token_ids):,})")
-  data = torch.tensor(cached_token_ids)
-else:
-  data = torch.tensor(tokenizer.encode(text))
 
-n = int(SPLIT_PERCENT * len(data))
-train_data = data[:n]
-val_data = data[n:]
+def init_data() -> None:
+  global train_data, val_data
+
+  text = DATA_PATH.read_text(encoding="utf-8", errors="ignore")
+  cached_token_ids = tokenizer.load_dataset_tokens_if_version_matches()
+  if cached_token_ids is not None:
+    print(f"Loaded cached dataset token ids ({len(cached_token_ids):,})")
+    data = torch.tensor(cached_token_ids)
+  else:
+    data = torch.tensor(tokenizer.encode(text))
+
+  n = int(SPLIT_PERCENT * len(data))
+  train_data = data[:n]
+  val_data = data[n:]
 
 def get_batch(split):
   data = train_data if split == "train" else val_data
@@ -187,38 +214,84 @@ def estimate_loss():
   m.train()
   return losses
 
+
+def save_checkpoint(model, optimizer, step: int) -> None:
+  MODEL_DIR.mkdir(parents=True, exist_ok=True)
+  CHECKPOINTS_DIR.mkdir(parents=True, exist_ok=True)
+  checkpoint_path = checkpoint_path_for_step(step)
+  checkpoint = {
+    "step": step,
+    "model_state_dict": model.state_dict(),
+    "optimizer_state_dict": optimizer.state_dict(),
+    "tokenizer_version": TOKENIZER_VERSION,
+  }
+  torch.save(checkpoint, checkpoint_path)
+  torch.save(model.state_dict(), WEIGHTS_PATH)
+  print(f"Saved checkpoint at step {step} to {checkpoint_path}")
+
+
+def save_sample(model, step: int) -> None:
+  model.eval()
+  context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)
+  generated_tokens = model.generate(context, max_new_tokens=SAMPLE_TOKENS)[0].tolist()
+  generated_text = tokenizer.decode(generated_tokens)
+
+  SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
+  sample_path = SAMPLES_DIR / f"sample_step_{step}.txt"
+  sample_path.write_text(generated_text, encoding="utf-8")
+  print(f"Saved sample to {sample_path}")
+  model.train()
+
+
+def load_checkpoint(model, optimizer) -> int:
+  latest_checkpoint = latest_checkpoint_path()
+  if latest_checkpoint is not None:
+    checkpoint = torch.load(latest_checkpoint, map_location=DEVICE)
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+    step = checkpoint["step"] + 1
+    print(f"Resumed from {latest_checkpoint} at step {checkpoint['step']}")
+    return step
+
+  if WEIGHTS_PATH.exists():
+    model.load_state_dict(torch.load(WEIGHTS_PATH, map_location=DEVICE))
+    print(f"Loaded weights from {WEIGHTS_PATH}")
+    return 0
+
+  return 0
+
+
 if __name__ == "__main__":
+  init_data()
   m = BigramLanguageModel().to(DEVICE)
-  m.load_state_dict(torch.load('model_weights.pt'))
   num_params = sum(p.numel() for p in m.parameters())
   print(f"{num_params/1e6:.3f}M parameters ({num_params:,} total)")
+  print(f"Device: {DEVICE}")
   optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
+  step = load_checkpoint(m, optimizer)
+
+  print("Training until manually stopped (Ctrl+C).")
+  print(f"Checkpoint + sample every {CHECKPOINT_INTERVAL:,} steps.")
 
   # Training loop
-  for step in range(MAX_ITER):
+  try:
+    while True:
       if step % EVAL_INTERVAL == 0:
         losses = estimate_loss()
         print(f"step {step}, train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
 
       xb, yb = get_batch("train")
-
       logits, loss = m(xb, yb)
       optimizer.zero_grad(set_to_none=True)
       loss.backward()
       optimizer.step()
-      
-  # save trained weights
-  save_path = 'model_weights.pt'
-  torch.save(m.state_dict(), save_path)
-  print(f"Saved model weights to {save_path}")
+      step += 1
 
-  # Generate 1000 tokens just for fun
-  m.eval()
-  context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)  # start token (assume 0)
-  generated_tokens = m.generate(context, max_new_tokens=1000)[0].tolist()
-  generated_text = tokenizer.decode(generated_tokens)
-  print("\n--- Generated Sample (1000 tokens) ---\n")
-  print(generated_text)
-  print("\n--- End of Sample ---\n")
+      if step % CHECKPOINT_INTERVAL == 0:
+        save_checkpoint(m, optimizer, step)
+        save_sample(m, step)
+  except KeyboardInterrupt:
+    save_checkpoint(m, optimizer, step)
+    print(f"\nStopped at step {step}. Checkpoint saved.")
 
 

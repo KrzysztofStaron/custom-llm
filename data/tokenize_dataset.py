@@ -16,7 +16,7 @@ from tokenizer import BPETokenizer
 
 
 DEFAULT_INPUT_PATH = Path("data/dataset.txt")
-DEFAULT_VERSION = "byte-bpe-v2"
+DEFAULT_VERSION = "byte-bpe-v3"
 DEFAULT_PROGRESS_BAR_WIDTH = 32
 DEFAULT_PROGRESS_EVERY = 10
 
