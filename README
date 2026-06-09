@@ -1,0 +1,36 @@
+This a Karpathy style GPT
+
+With a couple of improvements
+
+# v1
+
+This was the same ting as in v2, most improvement came form better datasets, and the first verion wasn't able to generate English words at all.
+
+# v2
+In the v1, dataset was really dirty containing lots of unnecesary markdown and characters outside of basic latin alphabet,
+Also the dataset was a mix of different languages.
+model had context length of 64 characters and user character-level tokenizer.
+
+Model is able to ocasionally generate English words.
+
+# v3
+In the v3, we have much bigger dataset 272M tokens, with 1.35M paramn count.
+The dataset is cleared out of unecesary structures, and is English only.
+Context length is 256 tokens (4x improvement),
+1 token is arosund 3.3 characters.
+Tokenizer has 2048 tokens.
+Effictively scaling the actual context length by a factor of x13. 
+
+# v3 what works what doesn't
+In this version model produces real English Language structures, rather than doing it ocasionally.
+SFT is pointless, since model is too small, and context window is still too small to fit any real instruction.
+Instruction tuning will happen in newer versions.
+
+
+# On the Files
+in order to run the training loop propetly, you first need to run:
+data/load_data.py - this will fetch and prepare the dataset
+train_tokenizer.py - this will train the BPETokenizer
+data/tokenizer_dataset.py - this will tokenize the dataset with the newly trained tokenizer
+train.py - this will run the trainig pipeline 
+

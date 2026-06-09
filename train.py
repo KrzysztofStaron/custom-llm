@@ -1,5 +1,6 @@
 import torch
 from pathlib import Path
+import checkpoints
 import model_config
 from paths import DATASET_PATH
 from settings import load_settings
@@ -35,20 +36,6 @@ N_LAYER = model_config.N_LAYER
 DROPOUT = 0.1
 TOKENIZER_VERSION = load_settings()["tokenizer"]["version"]
 
-
-def checkpoint_path_for_step(step: int) -> Path:
-  return CHECKPOINTS_DIR / f"checkpoint_{step}.pt"
-
-
-def latest_checkpoint_path() -> Path | None:
-  if not CHECKPOINTS_DIR.exists():
-    return None
-
-  checkpoints = list(CHECKPOINTS_DIR.glob("checkpoint_*.pt"))
-  if not checkpoints:
-    return None
-
-  return max(checkpoints, key=lambda path: int(path.stem.split("_")[-1]))
 
 class Head(nn.Module):
   def __init__(self, head_size: int):
@@ -219,52 +206,6 @@ def estimate_loss():
   return losses
 
 
-def save_checkpoint(model, optimizer, step: int) -> None:
-  MODEL_DIR.mkdir(parents=True, exist_ok=True)
-  CHECKPOINTS_DIR.mkdir(parents=True, exist_ok=True)
-  checkpoint_path = checkpoint_path_for_step(step)
-  checkpoint = {
-    "step": step,
-    "model_state_dict": model.state_dict(),
-    "optimizer_state_dict": optimizer.state_dict(),
-    "tokenizer_version": TOKENIZER_VERSION,
-  }
-  torch.save(checkpoint, checkpoint_path)
-  torch.save(model.state_dict(), WEIGHTS_PATH)
-  print(f"Saved checkpoint at step {step} to {checkpoint_path}")
-
-
-def save_sample(model, step: int) -> None:
-  model.eval()
-  context = torch.zeros((1, 1), dtype=torch.long, device=DEVICE)
-  generated_tokens = model.generate(context, max_new_tokens=SAMPLE_TOKENS)[0].tolist()
-  generated_text = tokenizer.decode(generated_tokens)
-
-  SAMPLES_DIR.mkdir(parents=True, exist_ok=True)
-  sample_path = SAMPLES_DIR / f"sample_step_{step}.txt"
-  sample_path.write_text(generated_text, encoding="utf-8")
-  print(f"Saved sample to {sample_path}")
-  model.train()
-
-
-def load_checkpoint(model, optimizer) -> int:
-  latest_checkpoint = latest_checkpoint_path()
-  if latest_checkpoint is not None:
-    checkpoint = torch.load(latest_checkpoint, map_location=DEVICE)
-    model.load_state_dict(checkpoint["model_state_dict"])
-    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-    step = checkpoint["step"] + 1
-    print(f"Resumed from {latest_checkpoint} at step {checkpoint['step']}")
-    return step
-
-  if WEIGHTS_PATH.exists():
-    model.load_state_dict(torch.load(WEIGHTS_PATH, map_location=DEVICE))
-    print(f"Loaded weights from {WEIGHTS_PATH}")
-    return 0
-
-  return 0
-
-
 if __name__ == "__main__":
   init_data()
   m = BigramLanguageModel().to(DEVICE)
@@ -272,7 +213,13 @@ if __name__ == "__main__":
   print(f"{num_params/1e6:.3f}M parameters ({num_params:,} total)")
   print(f"Device: {DEVICE}")
   optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
-  step = load_checkpoint(m, optimizer)
+  step = checkpoints.load_checkpoint(
+    checkpoints_dir=CHECKPOINTS_DIR,
+    weights_path=WEIGHTS_PATH,
+    model=m,
+    optimizer=optimizer,
+    device=DEVICE,
+  )
 
   steps_per_epoch = len(train_data) // TOKENS_PER_STEP
   max_iter = steps_per_epoch * EPOCHS
@@ -294,15 +241,53 @@ if __name__ == "__main__":
       step += 1
 
       if step % CHECKPOINT_INTERVAL == 0:
-        save_checkpoint(m, optimizer, step)
-        save_sample(m, step)
+        checkpoints.save_checkpoint(
+          model_dir=MODEL_DIR,
+          checkpoints_dir=CHECKPOINTS_DIR,
+          weights_path=WEIGHTS_PATH,
+          model=m,
+          optimizer=optimizer,
+          step=step,
+          tokenizer_version=TOKENIZER_VERSION,
+        )
+        checkpoints.save_sample(
+          samples_dir=SAMPLES_DIR,
+          model=m,
+          step=step,
+          device=DEVICE,
+          sample_tokens=SAMPLE_TOKENS,
+          tokenizer=tokenizer,
+        )
   except KeyboardInterrupt:
-    save_checkpoint(m, optimizer, step)
+    checkpoints.save_checkpoint(
+      model_dir=MODEL_DIR,
+      checkpoints_dir=CHECKPOINTS_DIR,
+      weights_path=WEIGHTS_PATH,
+      model=m,
+      optimizer=optimizer,
+      step=step,
+      tokenizer_version=TOKENIZER_VERSION,
+    )
     print(f"\nStopped early at step {step}. Checkpoint saved.")
     raise SystemExit(0)
 
-  save_checkpoint(m, optimizer, step)
-  save_sample(m, step)
+  checkpoints.save_checkpoint(
+    model_dir=MODEL_DIR,
+    checkpoints_dir=CHECKPOINTS_DIR,
+    weights_path=WEIGHTS_PATH,
+    model=m,
+    optimizer=optimizer,
+    step=step,
+    tokenizer_version=TOKENIZER_VERSION,
+  )
+  checkpoints.save_sample(
+    samples_dir=SAMPLES_DIR,
+    model=m,
+    step=step,
+    device=DEVICE,
+    sample_tokens=SAMPLE_TOKENS,
+    tokenizer=tokenizer,
+  )
   print(f"Finished training at step {step}.")
 
 
