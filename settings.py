@@ -19,7 +19,6 @@ DEFAULTS: dict[str, Any] = {
     "compression_bytes_per_token": None,
   },
   "dataset": {
-    "target_tokens_multiplier": 20,
     "token_count": None,
     "byte_count": None,
     "char_count": None,
@@ -83,6 +82,5 @@ def compute_model_param_count(settings: dict[str, Any]) -> int:
   return token_embedding + pos_embedding + lm_head + final_layer_norm + n_layer * block_params
 
 
-def get_target_tokens(settings: dict[str, Any]) -> float:
-  multiplier = settings["dataset"]["target_tokens_multiplier"]
+def get_target_tokens(settings: dict[str, Any], multiplier: float) -> float:
   return compute_model_param_count(settings) * multiplier

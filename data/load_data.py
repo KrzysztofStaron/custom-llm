@@ -1,3 +1,4 @@
+import math
 import sys
 from pathlib import Path
 
@@ -10,24 +11,32 @@ from clean import has_unwanted_chars, strip_markdown
 from settings import compute_model_param_count, get_target_tokens, load_settings, update_settings
 
 DATASET_PATH = ROOT / "data/dataset.txt"
-SOURCE_PARQUET = (
-    "hf://datasets/HuggingFaceTB/smollm-corpus/cosmopedia-v2/train-00000-of-00104.parquet"
-)
+PARQUET_TOTAL_SHARDS = 104
+ESTIMATED_TOKENS_PER_SHARD = 125_000_000
+TARGET_TOKENS_MULTIPLIER = 200
 
 settings = load_settings()
-TARGET_TOKENS = get_target_tokens(settings)
-CHARS_PER_TOKEN = settings["tokenizer"]["chars_per_token"]
 PARAM_COUNT = compute_model_param_count(settings)
-TOKEN_MULTIPLIER = settings["dataset"]["target_tokens_multiplier"]
+TARGET_TOKENS = get_target_tokens(settings, TARGET_TOKENS_MULTIPLIER)
+CHARS_PER_TOKEN = settings["tokenizer"]["chars_per_token"]
+SHARD_COUNT = min(
+    PARQUET_TOTAL_SHARDS,
+    max(1, math.ceil(TARGET_TOKENS / ESTIMATED_TOKENS_PER_SHARD)),
+)
+PARQUET_SHARD_URLS = [
+    f"hf://datasets/HuggingFaceTB/smollm-corpus/cosmopedia-v2/train-{shard:05d}-of-00104.parquet"
+    for shard in range(SHARD_COUNT)
+]
 
 print(
     f"Target tokens: {TARGET_TOKENS:,.0f} "
-    f"({PARAM_COUNT:,} params x {TOKEN_MULTIPLIER})"
+    f"({PARAM_COUNT:,} params x {TARGET_TOKENS_MULTIPLIER})"
 )
+print(f"Loading {SHARD_COUNT} parquet shard(s)...")
 
 ds = load_dataset(
     "parquet",
-    data_files=SOURCE_PARQUET,
+    data_files=PARQUET_SHARD_URLS,
     split="train",
 )
 

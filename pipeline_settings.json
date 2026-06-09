@@ -6,13 +6,12 @@
     "compression_bytes_per_token": null
   },
   "dataset": {
-    "target_tokens_multiplier": 20,
     "token_count": null,
     "byte_count": null,
-    "char_count": null,
-    "estimated_tokens": null,
-    "target_tokens": null,
-    "model_param_count": null,
+    "char_count": 89782347,
+    "estimated_tokens": 27018461.330123384,
+    "target_tokens": 27018240,
+    "model_param_count": 1350912,
     "tokens_bin_path": null
   }
 }
