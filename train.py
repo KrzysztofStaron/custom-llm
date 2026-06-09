@@ -1,5 +1,7 @@
 import torch
 from pathlib import Path
+import model_config
+from settings import load_settings
 from tokenizer import BPETokenizer
 from torch.nn import functional as F
 import torch.nn as nn
@@ -8,7 +10,7 @@ DATA_PATH = Path("data/dataset.txt")
 MODEL_NAME = "mimi-256-11"
 SPLIT_PERCENT = 0.9
 EPOCHS = 1
-CONTEXT_LENGTH = 256
+CONTEXT_LENGTH = model_config.CONTEXT_LENGTH
 BATCHE_SIZE = 128
 TOKENS_PER_STEP = BATCHE_SIZE * CONTEXT_LENGTH
 DEVICE = (
@@ -26,11 +28,11 @@ CHECKPOINTS_DIR = MODEL_DIR / "checkpoints"
 WEIGHTS_PATH = MODEL_DIR / "model_weights.pt"
 SAMPLES_DIR = MODEL_DIR / "samples"
 
-N_EMBD = 128
-N_HEAD = 4
-N_LAYER = 4
+N_EMBD = model_config.N_EMBD
+N_HEAD = model_config.N_HEAD
+N_LAYER = model_config.N_LAYER
 DROPOUT = 0.1
-TOKENIZER_VERSION = "byte-bpe-v3"
+TOKENIZER_VERSION = load_settings()["tokenizer"]["version"]
 
 
 def checkpoint_path_for_step(step: int) -> Path:

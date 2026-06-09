@@ -1,0 +1,18 @@
+{
+  "tokenizer": {
+    "version": "byte-bpe-v3",
+    "target_vocab_size": 2048,
+    "chars_per_token": 3.323,
+    "compression_bytes_per_token": null
+  },
+  "dataset": {
+    "target_tokens_multiplier": 20,
+    "token_count": null,
+    "byte_count": null,
+    "char_count": null,
+    "estimated_tokens": null,
+    "target_tokens": null,
+    "model_param_count": null,
+    "tokens_bin_path": null
+  }
+}

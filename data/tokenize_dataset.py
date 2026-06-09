@@ -14,11 +14,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
   sys.path.insert(0, str(PROJECT_ROOT))
 
+from settings import load_settings, update_settings
 from tokenizer import BPETokenizer, encode_bytes
 
 
 DEFAULT_INPUT_PATH = Path("data/dataset.txt")
-DEFAULT_VERSION = "byte-bpe-v3"
+DEFAULT_VERSION = load_settings()["tokenizer"]["version"]
 DEFAULT_PROGRESS_BAR_WIDTH = 32
 DEFAULT_CHUNK_SIZE = 2_000_000
 DEFAULT_WORKERS = max(1, (os.cpu_count() or 1) - 1)
@@ -163,9 +164,22 @@ def main() -> None:
   }
   meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
+  bytes_per_token = len(raw_bytes) / len(token_ids) if token_ids else 0.0
   print(f"Saved token ids to {output_path} ({len(token_ids):,} tokens)")
   print(f"Saved metadata to {meta_path}")
   print(f"Done in {elapsed:.1f}s ({len(token_ids) / elapsed:,.0f} tokens/s)")
+
+  update_settings({
+    "dataset": {
+      "token_count": len(token_ids),
+      "tokens_bin_path": str(output_path),
+      "byte_count": len(raw_bytes),
+    },
+    "tokenizer": {
+      "chars_per_token": bytes_per_token,
+      "compression_bytes_per_token": bytes_per_token,
+    },
+  })
 
 
 if __name__ == "__main__":

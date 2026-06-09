@@ -3,11 +3,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from settings import update_settings
+
 TOKENIZER_VERSION = "byte-bpe-v3"
 BASE_VOCAB_SIZE = 256
-DEFAULT_INPUT_PATH = Path("data/dataset.txt")
-DEFAULT_TARGET_VOCAB_SIZE = 2048
-DEFAULT_MAX_BYTES = 2_000_000
+TARGET_VOCAB_SIZE = 2048
+MAX_TRAIN_BYTES = 2_000_000
+DATASET_PATH = Path("data/dataset.txt")
 MIN_PAIR_FREQUENCY = 2
 MERGE_LOG_EVERY = 100
 MERGE_PREVIEW_BYTES = 24
@@ -75,9 +77,9 @@ def train_byte_bpe(raw_bytes: bytes, target_vocab_size: int) -> tuple[list[tuple
     return merges, vocab, token_ids
 
 
-def save_tokenizer(path: Path, merges: list[tuple[int, int, int]], vocab: dict[int, bytes]) -> None:
+def save_tokenizer(path: Path, version: str, merges: list[tuple[int, int, int]], vocab: dict[int, bytes]) -> None:
     payload = {
-        "version": TOKENIZER_VERSION,
+        "version": version,
         "base_vocab_size": BASE_VOCAB_SIZE,
         "vocab_size": len(vocab),
         "merges": [[a, b, new_id] for (a, b, new_id) in merges],
@@ -89,28 +91,32 @@ def save_tokenizer(path: Path, merges: list[tuple[int, int, int]], vocab: dict[i
 
 
 def main() -> None:
-    # Read input and config
-    input_path = DEFAULT_INPUT_PATH
-    vocab_size = DEFAULT_TARGET_VOCAB_SIZE
-    max_bytes = DEFAULT_MAX_BYTES
+    raw = DATASET_PATH.read_bytes()
+    if MAX_TRAIN_BYTES > 0:
+        raw = raw[: MAX_TRAIN_BYTES]
 
-    raw = input_path.read_bytes()
-    if max_bytes > 0:
-        raw = raw[: max_bytes]
+    print(f"Loaded {len(raw):,} bytes from {DATASET_PATH}")
+    merges, vocab, final_ids = train_byte_bpe(raw, TARGET_VOCAB_SIZE)
 
-    print(f"Loaded {len(raw):,} bytes from {input_path}")
-    merges, vocab, final_ids = train_byte_bpe(raw, vocab_size)
-
-    # Determine output path with tokenizer version in filename
-    output_dir = input_path.parent
-    output_path = output_dir / f"tokenizer_{TOKENIZER_VERSION}.json"
-
-    save_tokenizer(output_path, merges, vocab)
+    output_path = DATASET_PATH.parent / f"tokenizer_{TOKENIZER_VERSION}.json"
+    save_tokenizer(output_path, TOKENIZER_VERSION, merges, vocab)
 
     original_len = len(raw)
     tokenized_len = len(final_ids)
-    ratio = original_len / tokenized_len if tokenized_len else 0.0
-    print(f"Compression: {original_len:,} bytes -> {tokenized_len:,} tokens (x{ratio:.3f})")
+    bytes_per_token = original_len / tokenized_len if tokenized_len else 0.0
+    print(f"Compression: {original_len:,} bytes -> {tokenized_len:,} tokens (x{bytes_per_token:.3f})")
+
+    update_settings({
+        "tokenizer": {
+            "version": TOKENIZER_VERSION,
+            "target_vocab_size": TARGET_VOCAB_SIZE,
+            "compression_bytes_per_token": bytes_per_token,
+            "chars_per_token": bytes_per_token,
+        },
+        "dataset": {
+            "tokens_bin_path": f"data/dataset_tokens_{TOKENIZER_VERSION}.bin",
+        },
+    })
 
 
 if __name__ == "__main__":
