@@ -10,3 +10,9 @@ __pycache__/
 *.pyzwzw
 *.pyzwzwz
 .venv/
+
+# Dataset and tokenized outputs (large generated files)
+dataset.txt
+data/dataset.txt
+data/dataset_tokens*.bin
+data/dataset_tokens*.bin.meta.json
