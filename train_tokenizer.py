@@ -3,13 +3,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from paths import DATASET_PATH
 from settings import update_settings
 
 TOKENIZER_VERSION = "byte-bpe-v3"
 BASE_VOCAB_SIZE = 256
 TARGET_VOCAB_SIZE = 2048
 MAX_TRAIN_BYTES = 2_000_000
-DATASET_PATH = Path("data/dataset.txt")
 MIN_PAIR_FREQUENCY = 2
 MERGE_LOG_EVERY = 100
 MERGE_PREVIEW_BYTES = 24

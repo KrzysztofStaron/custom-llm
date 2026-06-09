@@ -8,9 +8,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from clean import has_unwanted_chars, strip_markdown
+from paths import DATASET_PATH
 from settings import compute_model_param_count, get_target_tokens, load_settings, update_settings
-
-DATASET_PATH = ROOT / "data/dataset.txt"
 PARQUET_TOTAL_SHARDS = 104
 ESTIMATED_TOKENS_PER_SHARD = 125_000_000
 TARGET_TOKENS_MULTIPLIER = 200
@@ -33,6 +32,7 @@ print(
     f"({PARAM_COUNT:,} params x {TARGET_TOKENS_MULTIPLIER})"
 )
 print(f"Loading {SHARD_COUNT} parquet shard(s)...")
+print(f"Writing dataset to {DATASET_PATH}")
 
 ds = load_dataset(
     "parquet",

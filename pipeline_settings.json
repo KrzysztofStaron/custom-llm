@@ -8,9 +8,9 @@
   "dataset": {
     "token_count": null,
     "byte_count": null,
-    "char_count": 89782347,
-    "estimated_tokens": 27018461.330123384,
-    "target_tokens": 27018240,
+    "char_count": 897817410,
+    "estimated_tokens": 270182789.6479085,
+    "target_tokens": 270182400,
     "model_param_count": 1350912,
     "tokens_bin_path": null
   }

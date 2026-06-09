@@ -1,12 +1,13 @@
 import torch
 from pathlib import Path
 import model_config
+from paths import DATASET_PATH
 from settings import load_settings
 from tokenizer import BPETokenizer
 from torch.nn import functional as F
 import torch.nn as nn
 
-DATA_PATH = Path("data/dataset.txt")
+DATA_PATH = DATASET_PATH
 MODEL_NAME = "mimi-256-11"
 SPLIT_PERCENT = 0.9
 EPOCHS = 1

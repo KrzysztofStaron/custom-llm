@@ -14,11 +14,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
   sys.path.insert(0, str(PROJECT_ROOT))
 
+from paths import DATASET_PATH, PROJECT_ROOT, resolve_project_path
 from settings import load_settings, update_settings
 from tokenizer import BPETokenizer, encode_bytes
 
 
-DEFAULT_INPUT_PATH = Path("data/dataset.txt")
+DEFAULT_INPUT_PATH = DATASET_PATH
 DEFAULT_VERSION = load_settings()["tokenizer"]["version"]
 DEFAULT_PROGRESS_BAR_WIDTH = 32
 DEFAULT_CHUNK_SIZE = 2_000_000
@@ -128,8 +129,10 @@ def main() -> None:
   if args.workers <= 0:
     raise ValueError("--workers must be > 0")
 
-  input_path: Path = args.input
-  output_path: Path = args.output or Path(f"data/dataset_tokens_{args.version}.bin")
+  input_path = resolve_project_path(args.input)
+  output_path = resolve_project_path(
+    args.output or Path(f"data/dataset_tokens_{args.version}.bin")
+  )
   meta_path = output_path.with_suffix(output_path.suffix + ".meta.json")
 
   if output_path.exists() and meta_path.exists() and not args.force:
