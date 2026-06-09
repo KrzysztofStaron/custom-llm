@@ -8,10 +8,15 @@ text = (
 )
 
 SPLIT_PERCENT = 0.9
-CONTEXT_LENGTH = 64
-BATCHE_SIZE = 16
-DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
-EVAL_ITERS = 200
+CONTEXT_LENGTH = 128
+BATCHE_SIZE = 128
+DEVICE = (
+  'cuda' if torch.cuda.is_available()
+  else 'mps' if torch.backends.mps.is_available()
+  else 'cpu'
+)
+EVAL_ITERS = 50
+EVAL_INTERVAL = 200
 MAX_ITER = 10000
 LEARNING_RATE = 1e-3
 N_EMBD = 128
@@ -149,7 +154,12 @@ class LayerNorm1d(nn.Module):
 tokenizer = BPETokenizer(TOKENIZER_VERSION)
 vocab_size = tokenizer.vocab_size
 
-data = torch.tensor(tokenizer.encode(text))
+cached_token_ids = tokenizer.load_dataset_tokens_if_version_matches()
+if cached_token_ids is not None:
+  print(f"Loaded cached dataset token ids ({len(cached_token_ids):,})")
+  data = torch.tensor(cached_token_ids)
+else:
+  data = torch.tensor(tokenizer.encode(text))
 
 n = int(SPLIT_PERCENT * len(data))
 train_data = data[:n]
@@ -179,13 +189,14 @@ def estimate_loss():
 
 if __name__ == "__main__":
   m = BigramLanguageModel().to(DEVICE)
+  m.load_state_dict(torch.load('model_weights.pt'))
   num_params = sum(p.numel() for p in m.parameters())
   print(f"{num_params/1e6:.3f}M parameters ({num_params:,} total)")
   optimizer = torch.optim.AdamW(m.parameters(), lr=LEARNING_RATE)
 
   # Training loop
   for step in range(MAX_ITER):
-      if step % EVAL_ITERS == 0:
+      if step % EVAL_INTERVAL == 0:
         losses = estimate_loss()
         print(f"step {step}, train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
 

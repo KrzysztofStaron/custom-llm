@@ -1,4 +1,5 @@
 import json
+from array import array
 from pathlib import Path
 
 
@@ -24,10 +25,12 @@ class CharTokenizer:
 
 class BPETokenizer:
   def __init__(self, version):
+    self.version = version
+    self.data_dir = Path(__file__).resolve().parent / "data"
     tokenizer_path = Path(__file__).resolve().parent / "data" / f"tokenizer_{version}.json"
     if not tokenizer_path.exists():
       if version == "bpe":
-        tokenizer_path = Path(__file__).resolve().parent / "data" / "tokenizer_bpe.json"
+        tokenizer_path = self.data_dir / "tokenizer_bpe.json"
       else:
         raise FileNotFoundError(f"Tokenizer file not found for version '{version}'.")
 
@@ -38,6 +41,26 @@ class BPETokenizer:
       for token_id, token_bytes in tokenizer_data["tokens"].items()
     }
     self.vocab_size = len(self.tokens)
+
+  def load_dataset_tokens_if_version_matches(self):
+    tokens_path = self.data_dir / f"dataset_tokens_{self.version}.bin"
+    meta_path = tokens_path.with_suffix(tokens_path.suffix + ".meta.json")
+    if not tokens_path.exists() or not meta_path.exists():
+      return None
+
+    meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    if meta.get("version") != self.version:
+      return None
+
+    token_ids = array("I")
+    bytes_count = tokens_path.stat().st_size
+    if bytes_count % token_ids.itemsize != 0:
+      return None
+
+    with tokens_path.open("rb") as token_file:
+      token_ids.fromfile(token_file, bytes_count // token_ids.itemsize)
+
+    return token_ids.tolist()
 
   def encode(self, text):
     token_ids = list(text.encode("utf-8"))
