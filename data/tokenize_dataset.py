@@ -4,10 +4,11 @@ import argparse
 import json
 import os
 import time
-from array import array
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 import sys
+
+import numpy as np
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -16,7 +17,7 @@ if str(PROJECT_ROOT) not in sys.path:
 
 from paths import DATASET_PATH, PROJECT_ROOT, resolve_project_path
 from settings import load_settings, update_settings
-from tokenizer import BPETokenizer, encode_bytes
+from tokenizer import BPETokenizer, encode_bytes_np
 
 
 DEFAULT_INPUT_PATH = DATASET_PATH
@@ -44,8 +45,8 @@ def _init_worker(merges: list[tuple[int, int, int]]) -> None:
   _MERGE_CACHE = merges
 
 
-def _encode_chunk(chunk: bytes) -> list[int]:
-  return encode_bytes(chunk, _MERGE_CACHE)
+def _encode_chunk(chunk: bytes) -> np.ndarray:
+  return encode_bytes_np(chunk, _MERGE_CACHE)
 
 
 def encode_parallel(
@@ -53,17 +54,17 @@ def encode_parallel(
   merges: list[tuple[int, int, int]],
   chunk_size: int,
   workers: int,
-) -> list[int]:
+) -> np.ndarray:
   chunks = [raw_bytes[i:i + chunk_size] for i in range(0, len(raw_bytes), chunk_size)]
   total_chunks = len(chunks)
 
   if workers <= 1 or total_chunks == 1:
     print(f"Encoding {len(raw_bytes):,} bytes in 1 chunk...")
-    return encode_bytes(raw_bytes, merges)
+    return encode_bytes_np(raw_bytes, merges)
 
   print(f"Encoding {len(raw_bytes):,} bytes across {total_chunks} chunks with {workers} workers...")
   start = time.time()
-  results: list[list[int] | None] = [None] * total_chunks
+  results: list[np.ndarray | None] = [None] * total_chunks
   completed = 0
 
   with ProcessPoolExecutor(
@@ -85,10 +86,7 @@ def encode_parallel(
       print(f"\r{progress} | elapsed {elapsed:6.1f}s", end="", flush=True)
 
   print()
-  token_ids: list[int] = []
-  for chunk_tokens in results:
-    token_ids.extend(chunk_tokens)
-  return token_ids
+  return np.concatenate(results)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -151,30 +149,29 @@ def main() -> None:
   token_ids = encode_parallel(raw_bytes, tokenizer.merges, args.chunk_size, args.workers)
   elapsed = time.time() - start
 
+  token_count = int(token_ids.size)
   output_path.parent.mkdir(parents=True, exist_ok=True)
-  ids_array = array("I", token_ids)
-  with output_path.open("wb") as out_file:
-    ids_array.tofile(out_file)
+  token_ids.astype(np.uint32, copy=False).tofile(output_path)
 
   meta = {
     "version": args.version,
     "input_path": str(input_path),
     "output_path": str(output_path),
-    "token_count": len(token_ids),
+    "token_count": token_count,
     "vocab_size": tokenizer.vocab_size,
     "chunk_size": args.chunk_size,
     "workers": args.workers,
   }
   meta_path.write_text(json.dumps(meta, indent=2), encoding="utf-8")
 
-  bytes_per_token = len(raw_bytes) / len(token_ids) if token_ids else 0.0
-  print(f"Saved token ids to {output_path} ({len(token_ids):,} tokens)")
+  bytes_per_token = len(raw_bytes) / token_count if token_count else 0.0
+  print(f"Saved token ids to {output_path} ({token_count:,} tokens)")
   print(f"Saved metadata to {meta_path}")
-  print(f"Done in {elapsed:.1f}s ({len(token_ids) / elapsed:,.0f} tokens/s)")
+  print(f"Done in {elapsed:.1f}s ({token_count / elapsed:,.0f} tokens/s)")
 
   update_settings({
     "dataset": {
-      "token_count": len(token_ids),
+      "token_count": token_count,
       "tokens_bin_path": str(output_path),
       "byte_count": len(raw_bytes),
     },

@@ -2,16 +2,16 @@
   "tokenizer": {
     "version": "byte-bpe-v3",
     "target_vocab_size": 2048,
-    "chars_per_token": 3.323,
-    "compression_bytes_per_token": null
+    "chars_per_token": 3.3036939660059903,
+    "compression_bytes_per_token": 3.3036939660059903
   },
   "dataset": {
-    "token_count": null,
-    "byte_count": null,
+    "token_count": 271761705,
+    "byte_count": 897817505,
     "char_count": 897817410,
     "estimated_tokens": 270182789.6479085,
     "target_tokens": 270182400,
     "model_param_count": 1350912,
-    "tokens_bin_path": null
+    "tokens_bin_path": "/Users/krzysztofstaron/Projects/custom-llm/data/dataset_tokens_byte-bpe-v3.bin"
   }
 }
