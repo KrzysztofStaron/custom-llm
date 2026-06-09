@@ -23,6 +23,8 @@ data/dataset_tokens*.bin
 data/dataset_tokens*.bin.meta.json
 
 # Large raw/archive data
+archive/
+archive.zip
 data/archive/
 data/archive.zip
 data/books*.txt
